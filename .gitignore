@@ -24,8 +24,8 @@ htmlcov/
 .virtual_documents/
 
 # Machine learning: experimentos y artefactos pesados
-# (el modelo final y los datos crudos del PFI NO se ignoran: se necesitan para
-#  reproducir y para el despliegue; si pesan demasiado, usar Git LFS o documentar cómo obtenerlos)
+# (el modelo final NO se ignora: se necesita para reproducir y para el despliegue;
+#  si pesa demasiado, usar Git LFS. Los datos crudos sí se ignoran: ver «Datos confidenciales»)
 mlruns/
 mlartifacts/
 wandb/
@@ -40,6 +40,13 @@ cache/
 joblib_cache/
 optuna.db
 *.db-journal
+
+# Datos confidenciales de la compañía (CSV y diccionario): nunca se suben.
+# Solo se versiona el LEEME que explica cómo obtenerlos.
+datos_crudos/*
+!datos_crudos/LEEME.md
+*.csv
+*.parquet
 
 # Datos temporales o derivados regenerables
 data/tmp/
