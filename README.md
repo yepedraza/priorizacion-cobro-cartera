@@ -20,6 +20,27 @@ El trabajo sigue las seis fases de CRISP-DM:
 - **Reproducibilidad:** semilla y versiones declaradas, rutas relativas y un cuaderno que corre desde un núcleo reiniciado.
 - **Transparencia:** todo uso de IA queda registrado (herramienta, prompt, qué se aceptó y qué se descartó).
 
+## Estructura del repositorio
+
+```
+├── retos/
+│   ├── modulo-2b/          R10–R14: un documento y un cuaderno por reto
+│   └── modulo-3/           R15–R18: segmentación, contraste, evaluación y cierre
+├── src/cartera/            código compartido: carga de datos, etiqueta, historial del cliente y backtest
+├── entrega/                piezas exclusivas de la entrega final: cuaderno, informe, resumen en inglés y anexos
+├── modelos/                modelo final guardado (Pipeline completo) y su hash
+├── app/                    servicio de despliegue (FastAPI + Docker)
+├── scripts/                utilidades, como el empaquetado del zip de la entrega
+├── datos_crudos/           datos de la compañía; fuera de Git salvo LEEME.md, que explica cómo obtenerlos
+├── declaracion_IA.md       registro de uso de IA de cada integrante
+└── requirements.txt        versiones exactas del entorno (Python 3.14.5)
+```
+
+- **Los nombres de los retos son los de Canvas**, para que cada artefacto se ubique sin buscarlo. Por ejemplo, R10 son `retos/modulo-2b/anteproyecto_PFI.md` y `viabilidad_R10.ipynb`.
+- **Los datos no están en el repositorio.** Son confidenciales y su uso está autorizado solo para este proyecto. Los cuadernos los buscan en `datos_crudos/` con rutas relativas.
+- **La preparación vive en `src/cartera/`** y no se copia entre cuadernos, de modo que los retos, el cuaderno final y la aplicación usan exactamente la misma etiqueta y las mismas variables.
+- **Cada documento existe una sola vez.** Por ejemplo, la ficha de datos vive en R11 y el script de `scripts/` la copia al zip.
+
 ## Contexto académico
 
 Proyecto Final Integrador del curso Machine Learning I, Maestría en Gerencia en IA.
