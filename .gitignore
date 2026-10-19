@@ -1,0 +1,100 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+dist/
+build/
+*.egg-info/
+.eggs/
+*.egg
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.python-version
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+.virtual_documents/
+
+# Machine learning: experimentos y artefactos pesados
+# (el modelo final y los datos crudos del PFI NO se ignoran: se necesitan para
+#  reproducir y para el despliegue; si pesan demasiado, usar Git LFS o documentar cómo obtenerlos)
+mlruns/
+mlartifacts/
+wandb/
+lightning_logs/
+runs/
+tensorboard_logs/
+catboost_info/
+*.ckpt
+*.tmp.joblib
+cache/
+.cache/
+joblib_cache/
+optuna.db
+*.db-journal
+
+# Datos temporales o derivados regenerables
+data/tmp/
+data/interim/
+datos_tmp/
+
+# Env y secretos
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.*
+.streamlit/secrets.toml
+
+# Carpeta privada del equipo (nunca se publica ni se entrega)
+interno/
+
+# Salida del empaquetado de la entrega
+ML1_PFI_*.zip
+
+# Logs
+*.log
+
+# Archivos temporales de Office y LaTeX
+~$*
+*.aux
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Claude Code (configuración local)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
