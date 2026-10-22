@@ -3,7 +3,7 @@
 > **Proyecto Final Integrador · Machine Learning I (IMPN0004) · Universidad EAN**
 > Fase CRISP-DM: **Comprensión del negocio** · Reto acumulativo: **R10 (anteproyecto)**
 > Integrantes: **Claudia Naranjo, Yery Pedraza y Nicolás Ruiz**
-> Última actualización: 2026-10-18
+> Última actualización: 2026-10-21
 
 Este documento fija el problema, la decisión que se quiere apoyar, la solución elegida y las reglas
 de juego del proyecto: definiciones, métricas, alcance y riesgos. Todo lo que se construya después
@@ -13,6 +13,17 @@ debe poder rastrearse hasta aquí.
 [`viabilidad_R10.ipynb`](viabilidad_R10.ipynb),
 que las calcula paso a paso. Junto a cada cifra se explica qué mide y cómo se obtuvo, y se indica la
 sección del cuaderno donde está el cálculo (por ejemplo, *[Cuaderno §2]*).
+
+**Enfoque del proyecto: intraemprendimiento.** El proyecto propone una mejora para el área de
+cartera de la propia compañía.
+
+- **Propuesta de valor:** una lista diaria que les dice a las dos gestoras a qué 20 clientes
+  contactar primero, ordenada por el dinero con mayor riesgo de pagarse con más de 30 días de
+  atraso. Así cobran antes con la misma capacidad del equipo.
+- **Usuarias:** las gestoras de cartera; el controller supervisa (§2).
+- **Hipótesis de mejora:** §2. **Impacto estimado y sus supuestos:** §3 y §8 (cada día menos de
+  recaudo libera ≈ $65 M).
+- **Ruta de validación:** el backtest (§8) y un piloto con grupo de comparación (§5, C).
 
 ---
 
@@ -71,8 +82,8 @@ actual, y con ello reducir los días que tarda la empresa en cobrar.
    los 19.262 saldos *[Cuaderno §1]*. Se analizan solo las facturas porque son la deuda que nace de
    vender, que es la que cartera cobra.
 2. **¿Por qué los montos son "aproximados (±15 %)"?** Para anonimizar los datos, cada saldo se
-   multiplicó por un factor secreto entre 0,85 y 1,15 (en promedio, 1). Por eso un monto individual
-   puede diferir hasta un 15 % del real. Al sumar miles de saldos, esas diferencias se compensan
+   multiplicó por un factor secreto entre 0,85 y 0,98 o entre 1,02 y 1,15 (en promedio, 1). Por eso
+   un monto individual difiere del real entre un 2 % y un 15 %. Al sumar miles de saldos, esas diferencias se compensan
    entre sí, así que los totales sí son una buena aproximación. Las proporciones dentro de un mismo
    saldo, como el porcentaje pagado, son exactas. Los montos están en pesos colombianos (COP); "M" =
    millones.
@@ -127,6 +138,28 @@ decisión que se quiere mejorar.
   cartera). Si la compañía cobrara en promedio un día antes, tendría por cobrar más o menos un día de
   facturación menos, es decir, **unos $65 M más disponibles en caja** (capital de trabajo liberado).
   Cobrar 5 días antes equivaldría a ≈ $325 M *[Cuaderno §2]*.
+
+### 3.5 Primer indicio de que modelar es viable
+
+Antes de prometer un modelo, se probó si un clasificador simple ordena las facturas tardías mejor
+que una línea base que no aprende nada *[Cuaderno §9]*:
+
+- **Muestra:** facturas de 2022 a 2024 con desenlace conocido. La partición es por fecha y se hace
+  antes de transformar: se entrena con 2022–2023 y se valida con 2024 (2.820 facturas, 30,2 %
+  tardías). Las de 2025 y 2026 no se tocan, porque quedan para la prueba final.
+- **Variables:** solo las que se conocen al emitir la factura (plazo, monto inicial, mes, empresa y
+  unidad de negocio). Todavía no se usa el historial del cliente.
+
+| Modelo | AUC-PR en validación |
+|---|---|
+| Línea base (predice siempre la proporción de tardías) | 0,302 |
+| Naive Bayes gaussiano | 0,321 |
+| KNN (k = 25) | **0,351** |
+
+La AUC-PR mide qué tan bien el modelo pone las facturas tardías por encima de las demás; a
+diferencia de la exactitud, no se infla cuando la clase de interés es minoritaria. Los dos modelos
+superan a la línea base, pero por poco: sin el historial del cliente, la información de la factura
+sola dice poco. Ese historial, calculado sin fuga (§7.1), es lo que debería ampliar la diferencia.
 
 ## 4. Enfoques evaluados
 
@@ -296,7 +329,8 @@ reglas la evitan:
    entre modelos o ajustar parámetros, se terminaría escogiendo el modelo que mejor le funciona *a ese
    conjunto en particular*, y la cifra final sería optimista. Todas las comparaciones se hacen con
    validación cruzada sobre entrenamiento; la prueba solo confirma el modelo ya elegido.
-7. **Reproducibilidad.** El cuaderno fija una **semilla aleatoria**: los procesos con azar, como
+7. **Reproducibilidad.** Los cuadernos fijan una **semilla aleatoria**, única para todo el proyecto
+   (`SEMILLA = 2026`, en `src/cartera/config.py`): los procesos con azar, como
    dividir datos o iniciar un modelo, dan siempre el mismo resultado, y cualquiera obtiene las mismas
    cifras. Imprime las **versiones** de Python y de las librerías, porque una versión distinta puede
    cambiar los resultados. Usa **rutas relativas** a la carpeta del proyecto, de modo que corre igual
@@ -343,6 +377,7 @@ sino el **top-K**: se gestionan los 20 de mayor prioridad.
 | Aspecto | Detalle |
 |---|---|
 | Fuente | Sistema contable (ERP) de la compañía; extracción con fecha de corte 2026-10-18 |
+| Fecha de acceso | 2026-10-18, el día en que el equipo recibió los datos |
 | Cobertura | **Toda la cartera** de la compañía, de diciembre de 2019 a octubre de 2026 |
 | Tablas | `saldos`: 19.262 filas, una por saldo. `movimientos`: 40.519 filas, una por cargo, pago o ajuste. Se unen por `id_saldo` y la relación está completa: no hay saldos sin movimientos ni movimientos sin saldo *[Cuaderno §1]* |
 | Alcance | 648 clientes, 4 empresas (la Empresa A concentra el 89 % de los saldos), 11 unidades de negocio, 22 vendedores, 17.920 facturas *[Cuaderno §1]* |
@@ -353,7 +388,7 @@ sino el **top-K**: se gestionan los 20 de mayor prioridad.
 
 | Hallazgo | Detalle | Qué se hace |
 |---|---|---|
-| Montos escalados | Cada saldo se multiplicó por un factor entre 0,85 y 1,15 (§3.1) | Se reportan totales como aproximados; los porcentajes dentro de un saldo son exactos |
+| Montos escalados | Cada saldo se multiplicó por un factor entre 0,85 y 0,98 o entre 1,02 y 1,15 (§3.1) | Se reportan totales como aproximados; los porcentajes dentro de un saldo son exactos |
 | Plazos negativos | 245 saldos con vencimiento anterior a la emisión: error de registro | Se excluyen del modelo |
 | Columna `cuota` sin información | Vale 0 en todas las filas, aunque el diccionario dice que normalmente es 1 | No se usa |
 | `fecha_radicacion` redundante | Es igual a la fecha de la factura en el 99,7 % de los casos | No se usa |
