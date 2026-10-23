@@ -78,15 +78,15 @@ clientes que reciban la gestión que se cree inferior. No se entrega `cierre_R18
 
 ## 5. Esquema de la sustentación
 
-Un mensaje por sección del informe. Quién presenta cada una y cuánto dura:
-`[POR COMPLETAR]`.
+Un mensaje por sección del informe. Cada integrante presenta desde el rol que defiende, y los tiempos
+respetan los de la sustentación (10 minutos de presentación y 5 de preguntas del jurado).
 
-| # | Sección | Mensaje | Cifra y artefacto |
-|---|---|---|---|
-| 1 | **Problema y decisión** | Se cobra unos 22 días tarde y las gestoras atienden 20 clientes por día; el modelo decide a cuáles | 20 de unos 135 clientes (`informe_avance_M2B.md` §1) |
-| 2 | **Datos** | Datos reales y confidenciales; el objetivo se construye: el atraso llega hasta el último recibo de caja | 15.822 facturas, 32,84 % tardías (§2) |
-| 3 | **Preparación y diseño experimental** | Se evalúa hacia adelante en el tiempo y solo se usa lo conocido al emitir la factura | Corte 1/07/2025; 11 predictoras; prueba consultada una vez (§3) |
-| 4 | **Modelado** | Ningún modelo más complejo superó a la logística por más que la variación; se elige el más simple | AUC-PR 0,720 frente a 0,730 de la red; variación entre pliegues 0,035 (§5, §6) |
-| 5 | **Evaluación** | En datos no vistos captura más dinero en riesgo que la regla actual, pero su probabilidad queda corta | 47,4 % frente a 37,9 %; AUC-PR 0,744 (`evaluacion_B.ipynb` §3) |
-| 6 | **Decisión con límites y gobernanza** | Se adopta con condiciones: ordena la lista, no se probó que gestionar reduzca el atraso, y el plan ya pide reentrenar | 38,6 % frente a 31–34 %; siete riesgos (§2, §3) |
-| 7 | **Roles del equipo** | Los tres trabajamos cada fase juntos; cada uno defiende un rol (Crack, Líder, Jefe/a) con sus decisiones | Registro de decisiones |
+| # | Sección | Presenta | Tiempo | Mensaje | Cifra y artefacto |
+|---|---|---|---|---|---|
+| 1 | **Problema y decisión** | Claudia Naranjo (Jefe/a) | 2 min | Se cobra unos 22 días tarde y las gestoras atienden 20 clientes por día; el modelo decide a cuáles | 20 de unos 135 clientes (`informe_avance_M2B.md` §1) |
+| 2 | **Datos** | Yery Pedraza (Líder) | 1 min | Datos reales y confidenciales; el objetivo se construye: el atraso llega hasta el último recibo de caja | 15.822 facturas, 32,84 % tardías (§2) |
+| 3 | **Preparación y diseño experimental** | Yery Pedraza (Líder) | 1 min | Se evalúa hacia adelante en el tiempo y solo se usa lo conocido al emitir la factura | Corte 1/07/2025; 11 predictoras; prueba consultada una vez (§3) |
+| 4 | **Modelado** | Nicolás Ruiz (Crack) | 1,5 min | Ningún modelo más complejo superó a la logística por más que la variación; se elige el más simple | AUC-PR 0,720 frente a 0,730 de la red; variación entre pliegues 0,035 (§5, §6) |
+| 5 | **Evaluación** | Nicolás Ruiz (Crack) | 1,5 min | En datos no vistos captura más dinero en riesgo que la regla actual, pero su probabilidad queda corta | 47,4 % frente a 37,9 %; AUC-PR 0,744 (`evaluacion_B.ipynb` §3) |
+| 6 | **Decisión con límites y gobernanza** | Claudia Naranjo (Jefe/a) | 2 min | Se adopta con condiciones: ordena la lista, no se probó que gestionar reduzca el atraso, y el plan ya pide reentrenar | 38,6 % frente a 31–34 %; siete riesgos (§2, §3) |
+| 7 | **Roles del equipo** | Los tres, una frase cada uno | 1 min | Los tres trabajamos cada fase juntos; cada uno defiende un rol (Crack, Líder, Jefe/a) con sus decisiones | Registro de decisiones |
