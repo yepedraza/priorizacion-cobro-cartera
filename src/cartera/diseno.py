@@ -17,7 +17,7 @@ from . import muestra as mu
 FECHA_CORTE = pd.Timestamp("2026-10-18")   # corte de los datos
 CORTE = pd.Timestamp("2025-07-01")         # entrenamiento | prueba (D-23)
 CORTE_VAL = pd.Timestamp("2024-07-01")     # subentrenamiento | validación (D-23)
-DESDE = pd.Timestamp("2022-01-01")         # periodo de estudio (anteproyecto §7.3)
+DESDE = pd.Timestamp("2022-01-01")         # periodo de estudio (diseno_experimental.md §6.3)
 BLOQUE = "Q"                               # trimestre de emisión (D-23)
 
 # Predictoras (D-24, sin `empresa` desde D-27: el grupo se trata como una sola empresa)

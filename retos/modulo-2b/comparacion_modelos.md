@@ -20,7 +20,7 @@ entrenamiento (2022-01 a 2025-06): **la prueba no se usó**.
 - **Métrica: AUC-PR** (área bajo la curva de precisión y exhaustividad). Las gestoras pueden atender
   solo 20 clientes por día, así que el modelo sirve si pone arriba las facturas que de verdad se van
   a atrasar. Un falso negativo cuesta días de caja sobre el saldo; un falso positivo, el tiempo de
-  una gestora y la incomodidad de un cliente cumplido (anteproyecto §8). La AUC-PR mide justo eso, y
+  una gestora y la incomodidad de un cliente cumplido (`diseno_experimental.md` §7). La AUC-PR mide justo eso, y
   no se infla con el 70 % de facturas a tiempo, como sí lo haría la exactitud.
 
 ## 2. Resultados

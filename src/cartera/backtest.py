@@ -1,4 +1,4 @@
-"""Backtest de la lista diaria (anteproyecto §8; D-07, D-15, D-17, D-19 y D-29).
+"""Backtest de la lista diaria (diseno_experimental.md §7; D-07, D-15, D-17, D-19 y D-29).
 
 Para cada día hábil *t* se reconstruye la cartera de facturas abiertas, con su saldo calculado con
 los movimientos anteriores a *t*, y se arman tres listas de K clientes:

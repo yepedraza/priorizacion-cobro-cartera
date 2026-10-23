@@ -4,7 +4,7 @@
 > Fase CRISP-DM: **Modelado (A)** · Reto acumulativo: **R15**
 > Integrantes: **Claudia Naranjo, Yery Pedraza y Nicolás Ruiz** · Última actualización: 2026-10-21
 
-Tipos de cliente según cómo pagan (componente A del anteproyecto §5), con el diseño de D-31. Las
+Tipos de cliente según cómo pagan (componente A del anteproyecto §4), con el diseño de D-31. Las
 cifras salen de [`kmeans_R15.ipynb`](kmeans_R15.ipynb) (*[§n]*). Los datos de la compañía no están
 en el repositorio.
 
@@ -17,7 +17,7 @@ en el repositorio.
 - **Clientes:** 226 *[§1]*. La cifra de 329 de D-09 venía de la definición anterior de «pagada» y de
   toda la historia.
 
-**Siete variables**, todas de cómo paga el cliente (anteproyecto §5, A):
+**Siete variables**, todas de cómo paga el cliente (anteproyecto §4, A):
 
 | Variable | Qué mide |
 |---|---|
@@ -110,5 +110,5 @@ En prueba, los 68 clientes asignados al centro más cercano se reparten casi igu
 
 Los grupos describen cómo pagó cada cliente entre 2022 y mediados de 2025. No dicen **por qué** paga
 así ni que vaya a seguir igual. Que un cliente esté en «paga tarde» tampoco prueba que llamarlo vaya
-a cambiar su comportamiento: eso solo lo mide un piloto (anteproyecto §5, C). R17 mide si los grupos
+a cambiar su comportamiento: eso solo lo mide un piloto (anteproyecto §4, C). R17 mide si los grupos
 anticipan lo que pasó después.
