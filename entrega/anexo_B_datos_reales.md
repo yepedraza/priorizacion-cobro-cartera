@@ -18,7 +18,7 @@ generados con código o con IA: el proyecto no genera datos sintéticos en ning�
 | Condición | Evidencia |
 |---|---|
 | Organización de origen | Grupo empresarial colombiano de servicios: cuatro empresas, once unidades de negocio. Su nombre no se publica, por confidencialidad |
-| Autorización por escrito | La compañía autorizó por escrito el uso de los datos para este proyecto académico. No hay licencia pública: los datos no se redistribuyen. `[POR COMPLETAR: quién firmó la autorización, con qué cargo y en qué fecha. El documento se conserva fuera del repositorio y se puede mostrar al jurado si lo pide.]` |
+| Autorización por escrito | Firmada el 22/10/2026 en Bogotá por el gerente de un área de la compañía, con facultad para autorizar el uso de su información, a nombre de los tres integrantes y exclusivamente para este proyecto. No hay licencia pública. Condiciones: no intentar reidentificar clientes, vendedores ni empresas; no publicar ni redistribuir los datos (en el repositorio solo va código y la compañía no se nombra); limitar el uso al proyecto y su sustentación; y la compañía puede revisar el informe antes de la entrega. El documento firmado se conserva fuera del repositorio, porque identifica a la compañía, y se muestra al jurado si lo pide |
 | Fecha de corte y de acceso | 18/10/2026, el día en que el equipo recibió los datos |
 | Cita (APA 7) | Compañía anonimizada. (2026). *Cartera de cuentas por cobrar: saldos y movimientos, 2019–2026* [Datos no publicados, anonimizados; uso autorizado para este proyecto]. |
 
