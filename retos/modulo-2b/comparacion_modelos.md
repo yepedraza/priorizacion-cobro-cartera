@@ -5,18 +5,18 @@
 > Integrantes: **Claudia Naranjo, Yery Pedraza y Nicolás Ruiz** · Última actualización: 2026-10-21
 
 Comparación de candidatos para el score de pago tardío (B). Las cifras salen de
-[`modelos_R13.ipynb`](modelos_R13.ipynb) (*[§n]*); el diseño se aprobó en D-26. Todo se mide con el
+[`modelos_R13.ipynb`](modelos_R13.ipynb) (*[§n]*); el diseño se aprobó antes de ver resultados. Todo se mide con el
 entrenamiento (2022-01 a 2025-06): **la prueba no se usó**.
 
 ## 1. Cómo se compara
 
-- **Misma partición y mismas columnas** que en R12: las 11 predictoras de D-24 y D-27 (el grupo se
-  trata como una sola empresa: `empresa` no es predictora) y el entrenamiento completo de D-23
+- **Misma partición y mismas columnas** que en R12: las 11 predictoras de R12 (el grupo se
+  trata como una sola empresa: `empresa` no es predictora) y el entrenamiento completo, con el corte del 1/07/2025
   (8.930 facturas, 30,2 % tardías).
 - **Validación cruzada agrupada por trimestre**, la unidad de agrupación de R12: 5 pliegues de
   ventana creciente. Cada uno valida un trimestre completo, de 2024-T2 a 2025-T2, y entrena con los
   anteriores, solo con facturas cuyo desenlace ya se conocía cuando empieza el trimestre validado
-  (D-17). El cuaderno verifica que ningún trimestre queda en los dos lados *[§1]*.
+  (solo desenlaces ya conocidos). El cuaderno verifica que ningún trimestre queda en los dos lados *[§1]*.
 - **Métrica: AUC-PR** (área bajo la curva de precisión y exhaustividad). Las gestoras pueden atender
   solo 20 clientes por día, así que el modelo sirve si pone arriba las facturas que de verdad se van
   a atrasar. Un falso negativo cuesta días de caja sobre el saldo; un falso positivo, el tiempo de
@@ -39,13 +39,13 @@ entrenamiento (2022-01 a 2025-06): **la prueba no se usó**.
 *[§2 y §3]*. Los valores por pliegue están en el cuaderno.
 
 **Búsqueda de hiperparámetros frente al modelo por defecto.** Se probaron 30 combinaciones por
-ensamble, con la misma CV y todas las filas (D-22). La búsqueda subió el bosque de 0,697 a 0,719 y el
+ensamble, con la misma CV y todas las filas de entrenamiento. La búsqueda subió el bosque de 0,697 a 0,719 y el
 boosting de 0,700 a 0,720 *[§3]*. Las dos mejoras son menores que la desviación de la CV (0,049 y
 0,043): no se distinguen del ruido. Además, la mejor de 30 combinaciones tiende a sobrestimarse.
 
 ## 3. Modelo final preliminar: regresión logística
 
-La regla se fijó antes de ver los resultados (D-26): gana el de mejor AUC-PR media; si su mejora
+La regla se fijó antes de ver los resultados: gana el de mejor AUC-PR media; si su mejora
 sobre la regresión logística no supera la desviación de la CV, gana la logística *[§4]*.
 
 - La regresión logística tiene la mejor AUC-PR media (0,720, empatada con el boosting ajustado al
@@ -101,7 +101,7 @@ el modelo dejó pasar *[§6]*.
   en la Empresa A. Son solo el 11 % de las facturas, tienen menos tardías (19,9 % frente a 32,2 %) y el
   modelo aprende sobre todo de la Empresa A: con un mismo cupo para todas, a sus facturas les toca
   menos. Las perjudicadas son esas empresas del grupo: su cartera tardía recibe menos seguimiento. Quitar
-  `empresa` de las predictoras (D-27) no lo corrige: con `empresa`, la tasa también era 61,4 %; solo
+  `empresa` de las predictoras no lo corrige: con `empresa`, la tasa también era 61,4 %; solo
   sube un poco la parte de sus facturas que se marca (de 14,6 % a 18,5 %).
 - **Clientes con poca historia:** reciben el error contrario. Se marca más de la mitad de sus facturas (52,3 %),
   aunque su proporción de tardías (31 %) es como la del resto, así que reciben más presión de cobro

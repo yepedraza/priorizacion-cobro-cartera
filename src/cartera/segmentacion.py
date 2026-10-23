@@ -1,4 +1,4 @@
-"""Segmentación de clientes A (R15 a R17, D-09 y D-31).
+"""Segmentación de clientes A (R15 a R17).
 
 Cada cliente se describe por **cómo pagó** sus facturas emitidas de 2022-01 a 2025-06 con desenlace
 conocido al 1/07/2025, igual que el entrenamiento de B. Lo que pasó después (2025-07 a 2026-09)
@@ -15,9 +15,9 @@ from . import etiqueta as et
 from . import muestra as mu
 from .diseno import CORTE, DESDE, FECHA_CORTE
 
-MIN_PAGADAS = 5   # D-09
-K = 2             # D-32
-N_INIT = 50       # reinicios de K-means: con 10, la solución dependía de la semilla (D-32)
+MIN_PAGADAS = 5   # criterio del equipo
+K = 2             # el único k estable
+N_INIT = 50       # reinicios de K-means: con 10, la solución dependía de la semilla
 
 VARIABLES = ["atraso_mediano", "atraso_iqr", "pct_tardias", "facturas_por_anio",
              "log_monto_mediano", "pct_varios_abonos", "pct_cierre_nota"]
@@ -26,7 +26,7 @@ VARIABLES = ["atraso_mediano", "atraso_iqr", "pct_tardias", "facturas_por_anio",
 def perfil(saldos: pd.DataFrame, movimientos: pd.DataFrame, min_pagadas: int = MIN_PAGADAS) -> pd.DataFrame:
     """Una fila por cliente (`nit_cliente`) con al menos `min_pagadas` facturas pagadas en la ventana.
 
-    - Pagadas: cerradas con etiqueta (D-16 y D-20); de ellas salen el atraso y los abonos.
+    - Pagadas: cerradas con etiqueta; de ellas salen el atraso y los abonos.
     - % de tardías: sobre todas las facturas con desenlace conocido al 1/07/2025 (cerradas con
       etiqueta y abiertas con más de 30 días vencidas).
     - % cerradas con notas o ajustes: sobre todas las cerradas de la ventana, con o sin RC.
@@ -86,11 +86,11 @@ class Recorte(BaseEstimator, TransformerMixin):
 
 
 def particion(p: pd.DataFrame, semilla: int):
-    """Clientes al azar: 70 % entrenamiento y 30 % prueba (D-31). Devuelve (entrenamiento, prueba)."""
+    """Clientes al azar: 70 % entrenamiento y 30 % prueba. Devuelve (entrenamiento, prueba)."""
     from sklearn.model_selection import train_test_split
     return train_test_split(p, test_size=0.3, random_state=semilla)
 
 
 def preparacion() -> Pipeline:
-    """Recorte de extremos y escala estándar (D-31)."""
+    """Recorte de extremos y escala estándar."""
     return Pipeline([("recorte", Recorte()), ("escala", StandardScaler())])

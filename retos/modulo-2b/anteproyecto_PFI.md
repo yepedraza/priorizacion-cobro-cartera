@@ -37,7 +37,7 @@ pactados, ponderados por monto *[Cuaderno §2]*). El 96 % de los saldos termina 
 | ¿Quién decide? | Las gestoras; el controller supervisa |
 | ¿Con qué frecuencia? | Todos los días hábiles |
 | ¿A quién afecta? | Clientes (presión de cobro), gestoras (su tiempo) y finanzas (cuándo entra el dinero) |
-| **Métrica de negocio** | Del dinero que aún estaba en duda y terminó pagándose con más de 30 días de atraso, qué parte estaba en la lista de 20, frente a la regla actual (D-07, D-15). Se traduce a caja con los días de recaudo: cada día menos libera **≈ $65 M**, lo que se factura en un día *[Cuaderno §2]* |
+| **Métrica de negocio** | Del dinero que aún estaba en duda y terminó pagándose con más de 30 días de atraso, qué parte estaba en la lista de 20, frente a la regla actual (mayor saldo vencido); solo cuenta el dinero que el día *t* aún tenía el desenlace incierto. Se traduce a caja con los días de recaudo: cada día menos libera **≈ $65 M**, lo que se factura en un día *[Cuaderno §2]* |
 | Métrica técnica | AUC-PR, precisión y recall en el top-20, calibración |
 
 **Hipótesis de mejora.** Con la misma capacidad, priorizar por *riesgo de pago tardío × saldo* y
@@ -66,8 +66,8 @@ Se evaluaron diez enfoques; se eligieron tres:
 | Componente | Qué responde | Técnica | Para quién |
 |---|---|---|---|
 | **A · Segmentación** (enfoque 1) | ¿Qué tipos de pagadores hay? Por atraso típico y su variación, % > 30 días, frecuencia y monto, abonos y cierres con notas | No supervisado: K-means, contrastado con DBSCAN y jerárquico | Cartera: tono y tratamiento del contacto |
-| **B · Score de pago tardío** (enfoques 2 y 3) | Probabilidad de que una factura se pague más de 30 días después del vencimiento. **Uso 1:** lista diaria por Σ probabilidad × saldo. **Uso 2:** alerta al facturar | Supervisado: 11 predictoras conocidas al emitir, de la factura y del historial del cliente (D-24, D-27) | Gestoras, cada mañana |
-| **C · Plazo real y gestión por segmento** (enfoque 6) | Cuánto tarda de verdad cada segmento en pagar y si el plazo mueve el pago, **comparando a cada cliente consigo mismo**; diseño de un piloto de gestión por segmento (aviso automático antes del vencimiento a quien paga a tiempo o casi; contacto apenas vence a quien paga tarde), con clientes asignados al azar | Política sugerida, no un modelo (D-35 a D-37) | Controller y dirección financiera |
+| **B · Score de pago tardío** (enfoques 2 y 3) | Probabilidad de que una factura se pague más de 30 días después del vencimiento. **Uso 1:** lista diaria por Σ probabilidad × saldo. **Uso 2:** alerta al facturar | Supervisado: 11 predictoras conocidas al emitir, de la factura y del historial del cliente; `empresa` no es predictora porque el grupo se trata como una sola empresa | Gestoras, cada mañana |
+| **C · Plazo real y gestión por segmento** (enfoque 6) | Cuánto tarda de verdad cada segmento en pagar y si el plazo mueve el pago, **comparando a cada cliente consigo mismo**; diseño de un piloto de gestión por segmento (aviso automático antes del vencimiento a quien paga a tiempo o casi; contacto apenas vence a quien paga tarde), con clientes asignados al azar | Política sugerida, no un modelo: el plazo se presenta como hipótesis a probar con el piloto y el aviso previo es automático | Controller y dirección financiera |
 
 C no es un modelo porque el plazo no se asignó al azar: se negoció con cada cliente, y los mejores
 pagadores probablemente recibieron más plazo. Por eso su efecto solo se mide con el piloto.
@@ -79,9 +79,10 @@ perjudicar a trabajadores); aprendizaje por refuerzo (no hay registros de las ac
 ## 5. Diseño, en resumen
 
 - **Unidad y objetivo de B:** la factura; pago tardío = atraso hasta el último recibo de caja mayor
-  que 30 días (D-16), solo con desenlace conocido (D-17).
+  que 30 días, con el atraso medido hasta el último pago con recibo de caja, y solo con desenlace conocido
+  (facturas vencidas hace al menos 30 días a la fecha de corte).
 - **Partición temporal:** entrenamiento 2022-01 a 2025-06, prueba 2025-07 a 2026-09, bloques por
-  trimestre (D-23, D-18). La prueba se consulta **una sola vez**.
+  trimestre, con corte el 1/07/2025. La prueba se consulta **una sola vez**.
 - **Sin fuga:** solo columnas conocidas al emitir; el historial, solo con facturas anteriores; toda
   transformación dentro de un `Pipeline`; semilla 2026.
 - **Backtest:** cada día hábil de la prueba se arman tres listas de 20 (regla actual, segunda línea
@@ -101,7 +102,7 @@ perjudicar a trabajadores); aprendizaje por refuerzo (no hay registros de las ac
 
 | Riesgo | Mitigación |
 |---|---|
-| **Fuga:** usar columnas que solo se conocen después de emitir, o historial calculado con el futuro | Lista de columnas (P) excluidas y prueba automática del historial (D-11) |
+| **Fuga:** usar columnas que solo se conocen después de emitir, o historial calculado con el futuro | Lista de columnas (P) excluidas y prueba automática del historial (el atraso promedio se recalcula solo con facturas pagadas antes de la emisión) |
 | **Sesgo:** el 89 % de los saldos es de la Empresa A; el modelo puede servir peor a B, C y D | Reportar el desempeño por empresa y no generalizar sin evidencia |
 | Un cliente cumplido recibe cobro insistente | El modelo prioriza, la gestora decide; el tono lo define el segmento |
 | Leer el plazo de C como causa | Presentarlo como hipótesis y validarlo con el piloto |

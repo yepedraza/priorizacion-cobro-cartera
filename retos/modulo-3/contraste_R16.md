@@ -4,7 +4,7 @@
 > Fase CRISP-DM: **Modelado (A)** · Reto acumulativo: **R16**
 > Integrantes: **Claudia Naranjo, Yery Pedraza y Nicolás Ruiz** · Última actualización: 2026-10-21
 
-¿La segmentación de R15 (K-means con k = 2: «paga a tiempo o casi» y «paga tarde», D-32) depende del
+¿La segmentación de R15 (K-means con k = 2: «paga a tiempo o casi» y «paga tarde»; se eligió k = 2 por ser el único estable) depende del
 algoritmo? Las cifras salen de [`contraste_R16.ipynb`](contraste_R16.ipynb) (*[§n]*). Los datos de
 la compañía no están en el repositorio.
 

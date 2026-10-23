@@ -1,4 +1,4 @@
-"""Genera los ocho gráficos del cuerpo del informe (D-39) en entrega/figuras/.
+"""Genera los ocho gráficos del cuerpo del informe en entrega/figuras/.
 
 Ninguno vuelve a consultar la prueba ni a entrenar un modelo. Las cifras se copian de salidas ya
 impresas en los artefactos del equipo; cada bloque cita de dónde sale.
@@ -75,8 +75,8 @@ def embudo():
     pasos = [("Saldos del ERP", 19262, None), ("Facturas", 17920, "1.342 saldos que no son facturas"),
              ("Facturas cerradas", 17235, "685 abiertas al corte"),
              ("Con atraso medible", 17209, "25 sin fecha de cancelación y 1 con plazo negativo"),
-             ("Con recibo de caja", 15925, "1.284 cerradas sin ningún recibo de caja (D-16)"),
-             ("Con etiqueta de B", 15822, "103 mixtas con recibo de menos del 90 % (D-20)")]
+             ("Con recibo de caja", 15925, "1.284 cerradas sin ningún recibo de caja"),
+             ("Con etiqueta de B", 15822, "103 mixtas con recibo de menos del 90 %")]
     fig, ax = plt.subplots(figsize=(7.2, 2.9))
     y = list(range(len(pasos)))[::-1]
     ax.barh(y, [p[1] for p in pasos], color=AZUL, height=0.62)
@@ -92,7 +92,7 @@ def embudo():
 
 
 def particion():
-    """Fig. 3 · Partición temporal (D-23; informe de avance §3)."""
+    """Fig. 3 · Partición temporal (informe de avance §3)."""
     fig, ax = plt.subplots(figsize=(7.2, 1.9))
     franjas = [(2022.0, 2024.5, "Subentrenamiento", "2022-01 a 2024-06", AZUL),
                (2024.5, 2025.5, "Validación", "2024-07 a\n2025-06", AGUA),
@@ -130,8 +130,8 @@ def candidatos():
 def backtest():
     """Fig. 5 · Monto en riesgo capturado en la prueba (evaluacion_B.ipynb §3, tabla impresa)."""
     k = ["K = 10", "K = 20", "K = 40"]
-    series = [("Modelo", [32.0, 47.4, 67.1], AZUL), ("Saldo de 1 a 30 días (D-19)", [26.9, 41.4, 60.1], AGUA),
-              ("Regla actual (D-07)", [24.0, 37.9, 57.3], NARANJA)]
+    series = [("Modelo", [32.0, 47.4, 67.1], AZUL), ("Saldo de 1 a 30 días", [26.9, 41.4, 60.1], AGUA),
+              ("Regla actual", [24.0, 37.9, 57.3], NARANJA)]
     fig, ax = plt.subplots(figsize=(7.2, 2.6))
     ancho = 0.26
     for j, (nombre, v, color) in enumerate(series):

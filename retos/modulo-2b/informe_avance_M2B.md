@@ -31,7 +31,7 @@ atrase.
   saldo.
 - **Métrica de negocio:** monto en riesgo capturado con el mismo cupo de 20 clientes, frente a la
   regla actual, en un backtest. Es distinta de la métrica técnica (§4).
-- **Enfoque:** intraemprendimiento: una mejora para el área de cartera de la propia compañía (D-21).
+- **Enfoque:** intraemprendimiento: una mejora para el área de cartera de la propia compañía.
 
 ## 2. Datos (R11)
 
@@ -45,10 +45,10 @@ atrase.
 
 **El objetivo se construye**, no viene en la base (`src/cartera/etiqueta.py`):
 - El atraso se mide hasta que entra el dinero: hasta el último recibo de caja (RC), no hasta que el
-  saldo queda en cero (D-16).
+  saldo queda en cero.
 - Quedan sin etiqueta 1.284 facturas cerradas sin ningún RC y 103 que se pagaron con RC menos del
-  90 % de su valor (D-20).
-- Solo se usan facturas que ya tuvieron 30 días para resolverse después de vencer (D-17).
+  90 % de su valor.
+- Solo se usan facturas que ya tuvieron 30 días para resolverse después de vencer.
 
 Así quedan 15.822 facturas cerradas con etiqueta, con **32,84 % de pago tardío**.
 
@@ -56,45 +56,44 @@ Así quedan 15.822 facturas cerradas con etiqueta, con **32,84 % de pago tardío
 en columnas posteriores a la emisión, que no entran al modelo. La peor es `dias_mora_actual`
 (96 %), que falta justo cuando el saldo está en cero: es un faltante estructural. Una SVM RBF tarda
 ≈ 1,5 s con todo el entrenamiento posible, así que la búsqueda de hiperparámetros usa todas las
-filas (D-22).
+filas de entrenamiento.
 
 ## 3. Diseño experimental sin fuga (R12)
 
 - **Unidad de agrupación:** el **trimestre de emisión**, no el cliente. El modelo se usa con los
-  mismos clientes, que se repiten mes a mes, y su información principal es su propio historial
-  (D-18).
-- **Partición temporal** (D-23): entrenamiento de 2022-01 a 2025-06 (8.930 facturas) y prueba de
+  mismos clientes, que se repiten mes a mes, y su información principal es su propio historial.
+- **Partición temporal** (corte el 1/07/2025): entrenamiento de 2022-01 a 2025-06 (8.930 facturas) y prueba de
   2025-07 a 2026-09 (3.970), **todavía sin usar**. Dentro del entrenamiento, el subentrenamiento va
   hasta 2024-06 y la validación es de 2024-07 a 2025-06. En cada corte solo entran facturas cuyo
   desenlace ya se conocía, y el cuaderno verifica que ningún trimestre queda en dos conjuntos.
-- **11 predictoras**, todas conocidas al emitir la factura (D-24 y D-27):
+- **11 predictoras**, todas conocidas al emitir la factura:
   - De la factura: plazo, monto inicial, mes, unidad de negocio y tipo de cliente.
   - Del historial del cliente antes de la emisión: atraso promedio, facturas pagadas, saldo abierto,
     facturas abiertas y vencidas, y antigüedad.
   - Una prueba automática recalcula el historial fila por fila y da lo mismo en los 1.800 valores
-    revisados (D-11).
+    revisados.
 
 **Columnas excluidas y su motivo:**
 
 | Motivo | Columnas |
 |---|---|
-| Derivadas del objetivo | «% de facturas con más de 30 días», segmento de A (D-10), `dias_hasta_cancelacion` |
+| Derivadas del objetivo | «% de facturas con más de 30 días», segmento de A (filtrarían la etiqueta), `dias_hasta_cancelacion` |
 | No disponibles antes de la decisión | Cancelación, créditos, saldo y estado al corte, recaudos, días de mora, tipo de cierre |
 | Calculadas con el periodo que se predice | Cualquier historial con facturas posteriores a la emisión |
 | Pueden cambiar después de la emisión | `total_debitos`, `codigo_cuenta` |
 | Identificadores | `nit_cliente`, `cliente`, `id_*` |
-| Uso descartado por el proyecto | `nombre_vendedor` (D-02, D-24) y `empresa`: el grupo se trata como una sola empresa (D-27); las dos se usan solo para auditar |
+| Uso descartado por el proyecto | `nombre_vendedor` y `empresa`: el grupo se trata como una sola empresa; las dos se usan solo para auditar |
 | Sin información o redundantes | `condicion_pago_inferida`, `cuota`, `fecha_radicacion`, actividad sintética, vencimiento |
 
 **Árbol de referencia:** 6 niveles y 36 hojas, elegido en validación como el más pequeño a menos de
-0,01 de la mejor AUC-PR (D-25). Brecha frente al subentrenamiento: 0,011. Lo domina el atraso
+0,01 de la mejor AUC-PR. Brecha frente al subentrenamiento: 0,011. Lo domina el atraso
 promedio histórico del cliente.
 
 ## 4. Comparación de candidatos (R13)
 
 Validación cruzada agrupada por trimestre, con 5 pliegues de ventana creciente (2024-T2 a 2025-T2).
 La métrica es la **AUC-PR**: con un cupo fijo, lo que importa es poner arriba las facturas que se van
-a atrasar, y la exactitud se inflaría con el 70 % de facturas a tiempo (D-26).
+a atrasar, y la exactitud se inflaría con el 70 % de facturas a tiempo.
 
 | Candidato | AUC-PR media ± desv. | Segundos por ajuste |
 |---|---|---|
@@ -107,14 +106,14 @@ a atrasar, y la exactitud se inflaría con el 70 % de facturas a tiempo (D-26).
 
 La búsqueda de hiperparámetros mejoró los ensambles respecto a su versión por defecto (0,697 →
 0,719 y 0,700 → 0,720), pero dentro de la desviación. **Ningún candidato supera a la regresión
-logística por más que la desviación de la CV**, así que por la regla de D-26 la logística es el
+logística por más que la desviación de la CV**, así que por la regla fijada de antemano la logística es el
 modelo final preliminar de R13. Por permutación en datos no vistos, lo que usa el modelo es el
 historial: el atraso promedio, las facturas vencidas y las facturas pagadas. Una columna de ruido
 muestra el sesgo de la importancia por impureza, que la pone 6.ª cuando por permutación da cero.
 
 ## 5. Red neuronal (R14)
 
-**Diseño** (D-28, *[Red §1]*): un perceptrón multicapa (`MLPClassifier`, optimizador Adam).
+**Diseño** (*[Red §1]*): un perceptrón multicapa (`MLPClassifier`, optimizador Adam).
 - Mismas 11 predictoras, mismos 5 pliegues y misma métrica que R13.
 - Imputación, escala y codificación dentro del `Pipeline`, ajustadas solo con el entrenamiento de
   cada pliegue. La escala es necesaria porque la red aprende por gradientes y, sin ella, el saldo
@@ -143,7 +142,7 @@ entre semillas y de 0,035 entre pliegues; ≈ 0,3 s por ajuste.
 
 ## 6. Modelo final preliminar del módulo
 
-Regla fijada antes de ver resultados (D-28, como D-26): la red reemplaza a la regresión logística
+Regla fijada antes de ver resultados, como en la comparación de modelos: la red reemplaza a la regresión logística
 solo si su mejora supera la variación entre semillas **y** la variación entre pliegues *[Red §4]*.
 
 | | Valor |
@@ -179,7 +178,7 @@ porque los montos están escalados *[Red §5]*.
 | Todas | 821 | 34,0 % | 33,4 % | 29,8 % de $3.937 M |
 
 - **Empresas B, C y D.** Los dos modelos dejan pasar alrededor del 60 % de sus facturas tardías y
-  del dinero tardío, el doble que en la Empresa A. Tratar el grupo como una sola empresa (D-27) no
+  del dinero tardío, el doble que en la Empresa A. Tratar el grupo como una sola empresa no
   lo corrige: tienen menos tardías (19,9 %) y el modelo aprende de la Empresa A, que tiene el 89 %
   de los datos. En dinero, son ≈ $119 M de los $1.173 M tardíos que la logística no marca (10 %).
   Su cartera tardía recibe menos seguimiento, y se declara como límite.
@@ -197,5 +196,5 @@ Empresa A).
   el saldo, así que tiene que estar calibrada.
 - **Prueba y backtest, una sola vez:** con el modelo final ya elegido, se mide en la prueba
   (2025-07 a 2026-09) el monto en riesgo capturado por la lista de 20 clientes, frente a las dos
-  líneas base de negocio (D-07, D-19).
+  líneas base de negocio.
 - **Segmentación (A) y plazo por segmento (C)**, en el Módulo 3.

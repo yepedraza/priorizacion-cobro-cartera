@@ -1,11 +1,11 @@
-"""Historial del cliente el día en que se emite cada factura (D-11 y D-24).
+"""Historial del cliente el día en que se emite cada factura.
 
 Cada variable usa solo hechos ocurridos **antes** del día de emisión *t* (estrictamente antes: lo
 del mismo día no cuenta), para que el modelo vea lo mismo que vería el día que se emite la factura.
 
 | Variable | Qué es, el día *t* |
 |---|---|
-| `atraso_prom_hist` | Atraso promedio (D-16 y D-20) de las facturas del cliente canceladas antes de *t*. Nulo si no hay ninguna |
+| `atraso_prom_hist` | Atraso promedio de las facturas del cliente canceladas antes de *t*. Nulo si no hay ninguna |
 | `n_pagadas_hist` | Cuántas de esas facturas hay. 0 = cliente sin historial de pago |
 | `saldo_abierto_t` | Saldo del cliente en facturas, sumando los movimientos anteriores a *t* |
 | `n_abiertas_t` | Facturas del cliente emitidas antes de *t* que no estaban canceladas antes de *t* |
@@ -99,9 +99,9 @@ def calcular_fuerza_bruta(fila: pd.Series, saldos: pd.DataFrame, movimientos: pd
                           pagadas: pd.DataFrame) -> dict:
     """Recalcula el historial de una sola factura filtrando explícitamente por fecha.
 
-    Es la prueba de D-11: usa solo filas cuya fecha es anterior a la emisión, escrito de la forma
+    Es la prueba del historial: usa solo filas cuya fecha es anterior a la emisión, escrito de la forma
     más directa posible, para compararlo con `calcular`. `pagadas` son las cerradas con su
-    columna `atraso` (etiqueta D-16 y D-20).
+    columna `atraso` (la etiqueta de B).
     """
     t = fila.fecha.normalize()
     cliente = fila.nit_cliente

@@ -4,7 +4,7 @@
 > Fase CRISP-DM: **Evaluación (A)** · Reto acumulativo: **R17**
 > Integrantes: **Claudia Naranjo, Yery Pedraza y Nicolás Ruiz** · Última actualización: 2026-10-21
 
-¿Se adopta la segmentación de R15 (K-means con k = 2: «paga a tiempo o casi» y «paga tarde», D-32),
+¿Se adopta la segmentación de R15 (K-means con k = 2: «paga a tiempo o casi» y «paga tarde»; se eligió k = 2 por ser el único estable),
 contrastada en R16? Las cifras salen de [`evaluacion_R17.ipynb`](evaluacion_R17.ipynb) (*[§n]*). k,
 la preparación y los centros se fijaron en R15, antes de mirar el desenlace. Los datos de la
 compañía no están en el repositorio.
@@ -96,11 +96,11 @@ variables.
 - se explica con un solo eje: qué tan mal paga el cliente.
 
 **Condiciones:**
-1. **Se usa para el tono del contacto y para describir la cartera, no como predictor de B** (D-10).
+1. **Se usa para el tono del contacto y para describir la cartera, no como predictor de B** (el «% de facturas con más de 30 días» filtraría la etiqueta).
    Acompaña la lista diaria: le dice a la gestora qué tipo de cliente tiene enfrente.
 2. **Se recalcula con la historia reciente.** Los niveles de atraso cambian con el tiempo; un cliente
    cerca del corte puede cambiar de segmento.
-3. **Los clientes con menos de 5 facturas pagadas quedan como «sin historia suficiente»** (D-09) y no
+3. **Los clientes con menos de 5 facturas pagadas quedan como «sin historia suficiente»** (el mínimo de 5 facturas pagadas) y no
    se les asigna segmento.
 
 **Lo que cambiaría la decisión:** que, al recalcularla con datos nuevos, la diferencia de tardías

@@ -4,17 +4,17 @@
 > Fase CRISP-DM: **Modelado (A)** · Reto acumulativo: **R15**
 > Integrantes: **Claudia Naranjo, Yery Pedraza y Nicolás Ruiz** · Última actualización: 2026-10-21
 
-Tipos de cliente según cómo pagan (componente A del anteproyecto §4), con el diseño de D-31. Las
+Tipos de cliente según cómo pagan (componente A del anteproyecto §4), con el diseño de segmentación que el equipo fijó antes de ver resultados. Las
 cifras salen de [`kmeans_R15.ipynb`](kmeans_R15.ipynb) (*[§n]*). Los datos de la compañía no están
 en el repositorio.
 
 ## 1. Datos, variables y columnas excluidas
 
-- **Unidad:** el cliente con al menos 5 facturas pagadas (D-09). Las pagadas son las cerradas con
-  etiqueta según D-16 y D-20.
+- **Unidad:** el cliente con al menos 5 facturas pagadas (criterio del equipo). Las pagadas son las cerradas con
+  etiqueta: atraso hasta el último RC, sin las facturas sin RC ni las mixtas con RC de menos del 90 %.
 - **Ventana:** facturas emitidas de 2022-01 a 2025-06 con desenlace conocido al 1/07/2025, la misma
   del entrenamiento de B. Lo posterior se reserva para evaluar la segmentación en R17.
-- **Clientes:** 226 *[§1]*. La cifra de 329 de D-09 venía de la definición anterior de «pagada» y de
+- **Clientes:** 226 *[§1]*. La cifra inicial de 329 clientes venía de la definición anterior de «pagada» y de
   toda la historia.
 
 **Siete variables**, todas de cómo paga el cliente (anteproyecto §4, A):
@@ -27,14 +27,14 @@ en el repositorio.
 | Facturas por año | Con qué frecuencia se le factura |
 | Monto mediano (log) | Cuánto se le factura |
 | % pagadas con varios abonos | Si suele pagar con abonos parciales |
-| % cerradas con notas o ajustes | Cierres sin pago (D-16) |
+| % cerradas con notas o ajustes | Cierres sin pago (quedan fuera de la etiqueta) |
 
 **Excluidas:**
 
 | Columnas | Motivo |
 |---|---|
 | Identificadores (`nit_cliente`, `cliente`, `id_*`) | El algoritmo no debe distinguir clientes por su código |
-| `empresa`, `nombre_vendedor` | El grupo se trata como una sola empresa (D-27); no se juzga a los vendedores (D-02) |
+| `empresa`, `nombre_vendedor` | El grupo se trata como una sola empresa; no se juzga a los vendedores |
 | Todo lo posterior al 1/07/2025 | Es el desenlace externo de R17 |
 | Puntaje del modelo B | La segmentación debe describir a los clientes por sí misma |
 
@@ -67,7 +67,7 @@ k = 7 y se aplana después, cuando ya aparecen grupos de menos del 5 %.
 
 ## 4. Elección de k
 
-**k = 2** (D-32). Se eligió con la estabilidad y la interpretación, no solo con un índice:
+**k = 2**. Se eligió con la estabilidad y la interpretación, no solo con un índice:
 
 | | k = 2 | k = 3 | k = 4 |
 |---|---|---|---|
@@ -80,7 +80,7 @@ k = 7 y se aplana después, cuando ya aparecen grupos de menos del 5 %.
 
 - **Estabilidad entre semillas.** Con 10 reinicios, k = 3 cambiaba según la semilla. Con 50 se
   estabiliza, y por eso se usan 50.
-- **La prueba decisiva es la sensibilidad al mínimo de facturas** que D-09 prometía. Solo con k = 2
+- **La prueba decisiva es la sensibilidad al mínimo de facturas** que se había prometido probar. Solo con k = 2
   los grupos se mantienen al pasar de 5 a 3 o a 10 facturas.
 - **Por qué no k = 3.** Encajaba con los tres tratamientos del anteproyecto, pero su tercer grupo
   (11 clientes muy tardíos e irregulares) desaparece al cambiar un criterio arbitrario del equipo.

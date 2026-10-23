@@ -39,10 +39,10 @@ saldo *[Viab. §1]*. Tipos: en saldos, 18 de texto, 24 numéricas, 9 fechas y 3 
 - **Objetivo:** `tardia`, pago tardío. Vale 1 si la factura se pagó más de 30 días después de su
   vencimiento y 0 si no. No es una columna de la base: se construye en `src/cartera/etiqueta.py`.
   - El atraso se mide hasta que entra el dinero, no hasta que el saldo queda en cero: hasta el
-    cierre, si lo cerró un RC, o hasta el último RC, si lo cerró una nota (D-16).
+    cierre, si lo cerró un RC, o hasta el último RC, si lo cerró una nota (el atraso se mide hasta el último pago con recibo de caja).
   - Quedan sin etiqueta las facturas cerradas sin ningún RC y las que se pagaron con RC menos del
-    90 % de su valor (D-20).
-  - Solo se usan facturas que ya tuvieron 30 días para resolverse después de vencer (D-17).
+    90 % de su valor (la etiqueta debe describir un pago, no un cierre casi sin dinero).
+  - Solo se usan facturas que ya tuvieron 30 días para resolverse después de vencer (se exige un desenlace ya conocido a la fecha de corte).
 - **Desbalance:** 32,84 % de pago tardío en las 15.822 cerradas con etiqueta; ≈ 30 % por año en
   2022–2024 *[Diag. §1.6 y §4]*.
 
@@ -54,7 +54,7 @@ saldo *[Viab. §1]*. Tipos: en saldos, 18 de texto, 24 numéricas, 9 fechas y 3 
 | Duplicados | Ninguno, con o sin las columnas de identificadores *[Diag. §3]* | — |
 | Categorías | Sin variantes de escritura. `condicion_pago_inferida` repite el plazo por tramos y su tramo C15 incluye los 245 plazos negativos *[Diag. §4]* | Se usa el plazo, no la condición |
 | Plazos negativos | 245 saldos con vencimiento anterior a la emisión: error de registro *[Viab. §7]* | Se excluyen |
-| Cierres sin pago | 1.284 facturas cerradas sin ningún RC y 511 mixtas *[Diag. §1.2]* | Etiqueta según D-16 y D-20 |
+| Cierres sin pago | 1.284 facturas cerradas sin ningún RC y 511 mixtas *[Diag. §1.2]* | Etiqueta: atraso hasta el último RC; las sin RC y las mixtas con RC de menos del 90 % quedan fuera |
 | Cerradas sin fecha | 25 facturas en cero sin fecha de cancelación *[Diag. §1.1]* | Sin atraso medible: sin etiqueta |
 | Columnas sin información | `cuota` vale 0 siempre; `fecha_radicacion` es igual a la emisión en el 99,7 % *[Viab. §7]* | No se usan |
 | Categorías del diccionario ausentes | La cuenta 131510 y el tipo de cliente `INDETERMINADO` no aparecen *[Diag. §4]* | Se documenta |
@@ -70,7 +70,7 @@ saldo *[Viab. §1]*. Tipos: en saldos, 18 de texto, 24 numéricas, 9 fechas y 3 
 - **Datos sensibles:** ninguno. La compañía anonimizó todo el conjunto, así que ninguna columna
   identifica a una persona. Si `nombre_vendedor` y `tipo_cliente` entran como predictoras se decide en
   R12.
-- **Identificadores:** fuera, para que el modelo no memorice al cliente (D-18).
+- **Identificadores:** fuera, para que el modelo no memorice al cliente (la validación se agrupa por bloque de tiempo y no por cliente).
 - **Representatividad:** el 98,3 % de los saldos es de personas jurídicas nacionales y la Empresa A
   concentra el 89 %. Los resultados no representan bien a personas naturales, clientes del exterior
   ni a las empresas B, C y D.

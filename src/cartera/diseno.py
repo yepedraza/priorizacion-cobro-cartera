@@ -1,4 +1,4 @@
-"""Diseño experimental de B: partición, variables y preparación (R12, D-18, D-23 y D-24).
+"""Diseño experimental de B: partición, variables y preparación (R12).
 
 Lo usan R12, R13 y lo que sigue, para que todos vean exactamente la misma partición y las mismas
 columnas.
@@ -15,12 +15,12 @@ from . import historial as hi
 from . import muestra as mu
 
 FECHA_CORTE = pd.Timestamp("2026-10-18")   # corte de los datos
-CORTE = pd.Timestamp("2025-07-01")         # entrenamiento | prueba (D-23)
-CORTE_VAL = pd.Timestamp("2024-07-01")     # subentrenamiento | validación (D-23)
+CORTE = pd.Timestamp("2025-07-01")         # entrenamiento | prueba
+CORTE_VAL = pd.Timestamp("2024-07-01")     # subentrenamiento | validación
 DESDE = pd.Timestamp("2022-01-01")         # periodo de estudio (diseno_experimental.md §6.3)
-BLOQUE = "Q"                               # trimestre de emisión (D-23)
+BLOQUE = "Q"                               # trimestre de emisión
 
-# Predictoras (D-24, sin `empresa` desde D-27: el grupo se trata como una sola empresa)
+# Predictoras (sin `empresa`: el grupo se trata como una sola empresa)
 NUM = mu.NUM_PROVISIONALES + hi.VARIABLES_HISTORIAL
 CAT = ["unidad_negocio", "tipo_cliente"]
 
@@ -34,7 +34,7 @@ def conjuntos(saldos: pd.DataFrame, movimientos: pd.DataFrame) -> dict:
     """Subentrenamiento, validación, entrenamiento completo y prueba, con sus predictoras.
 
     En cada conjunto solo entran facturas cuyo desenlace ya se conocía en la fecha en que termina
-    (D-17): `vencimiento + 30 ≤` 2024-07-01, 2025-07-01, 2025-07-01 y 2026-10-18.
+    (desenlace conocido): `vencimiento + 30 ≤` 2024-07-01, 2025-07-01, 2025-07-01 y 2026-10-18.
     """
     hasta_corte = _conocidas_a(saldos, movimientos, CORTE)
     sub = _conocidas_a(saldos, movimientos, CORTE_VAL)
@@ -54,11 +54,11 @@ def conjuntos(saldos: pd.DataFrame, movimientos: pd.DataFrame) -> dict:
 
 
 def pliegues(ent: pd.DataFrame, n: int = 5) -> list:
-    """CV agrupada por trimestre, de ventana creciente (D-18, D-26).
+    """CV agrupada por trimestre, de ventana creciente.
 
     Cada pliegue valida uno de los últimos `n` trimestres de `ent` y entrena con los trimestres
     anteriores, solo con facturas cuyo `vencimiento + 30` cae antes de que empiece el trimestre
-    validado (D-17 en cada corte). Devuelve posiciones (no etiquetas de índice), como espera
+    validado (la regla de desenlace conocido se aplica en cada corte). Devuelve posiciones (no etiquetas de índice), como espera
     scikit-learn.
     """
     trimestre = ent.fecha.dt.to_period(BLOQUE).to_numpy()

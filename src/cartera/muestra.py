@@ -18,9 +18,9 @@ CAT_PROVISIONALES = ["empresa", "unidad_negocio"]
 
 def desenlace_conocido(saldos: pd.DataFrame, movimientos: pd.DataFrame,
                        fecha_corte: pd.Timestamp) -> pd.DataFrame:
-    """Facturas cuyo desenlace se conoce a `fecha_corte` (D-17), con la columna `tardia` (0/1).
+    """Facturas cuyo desenlace se conoce a `fecha_corte`, con la columna `tardia` (0/1).
 
-    - Cerradas: etiqueta de D-16 y D-20; las sin RC y las mixtas con poco RC quedan fuera.
+    - Cerradas: etiqueta de B; las sin RC y las mixtas con poco RC quedan fuera.
     - Abiertas que ya llevan más de 30 días vencidas: tardia = 1.
     - Solo facturas con `fecha_vencimiento + 30 ≤ fecha_corte`.
     """

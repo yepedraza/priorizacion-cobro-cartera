@@ -1,14 +1,14 @@
-"""Backtest de la lista diaria (diseno_experimental.md §7; D-07, D-15, D-17, D-19 y D-29).
+"""Backtest de la lista diaria (diseno_experimental.md §7).
 
 Para cada día hábil *t* se reconstruye la cartera de facturas abiertas, con su saldo calculado con
 los movimientos anteriores a *t*, y se arman tres listas de K clientes:
 
-- **Regla actual (D-07):** mayor saldo vencido.
-- **Segunda línea base (D-19):** mayor saldo en facturas de 1 a 30 días de mora.
-- **Modelo (D-29):** entre los clientes con alguna factura vencida, mayor suma de
+- **Regla actual:** mayor saldo vencido.
+- **Segunda línea base:** mayor saldo en facturas de 1 a 30 días de mora.
+- **Modelo:** entre los clientes con alguna factura vencida, mayor suma de
   probabilidad × saldo en sus facturas con dinero en duda.
 
-**Dinero en duda (D-15):** facturas no vencidas o vencidas hace 30 días o menos el día *t*. La
+**Dinero en duda:** facturas no vencidas o vencidas hace 30 días o menos el día *t*. La
 métrica principal es qué parte del dinero en duda que terminó tardío estaba en la lista.
 """
 
@@ -18,14 +18,14 @@ import pandas as pd
 from . import muestra as mu
 
 TOL = mu.TOL
-LISTAS = ["regla actual (D-07)", "saldo de 1 a 30 días (D-19)", "modelo"]
+LISTAS = ["regla actual", "saldo de 1 a 30 días", "modelo"]
 
 
 def desenlace_final(saldos: pd.DataFrame, movimientos: pd.DataFrame, fecha_corte: pd.Timestamp) -> pd.Series:
     """`tardia` final de cada factura (1/0), indexada por `id_saldo`.
 
     Las facturas que no aparecen tienen desenlace desconocido a `fecha_corte` o quedaron sin
-    etiqueta (cierres sin pago, D-16 y D-20).
+    etiqueta (cierres sin pago y mixtas con poco RC).
     """
     d = mu.desenlace_conocido(saldos, movimientos, fecha_corte)
     return d.set_index("id_saldo").tardia

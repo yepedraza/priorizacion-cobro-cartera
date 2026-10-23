@@ -1,4 +1,4 @@
-"""Genera los cinco gráficos de validación del anexo del informe (D-39) en entrega/figuras/.
+"""Genera los cinco gráficos de validación del anexo del informe en entrega/figuras/.
 
 Se calculan con los datos de la compañía (`datos_crudos/`), **sin la prueba**: solo con facturas
 emitidas antes del corte del 1/07/2025 y con desenlaces conocidos a esa fecha. El conjunto de prueba
@@ -51,7 +51,7 @@ def legible(nombre):
 
 
 def calibrada(datos_ent):
-    """Modelo de la lista diaria (D-30): logística sin class_weight, como en evaluacion_B.ipynb."""
+    """Modelo de la lista diaria: logística sin class_weight, como en evaluacion_B.ipynb."""
     return Pipeline([("prep", dis.prep_lineal()), ("est", LogisticRegression(class_weight=None, max_iter=2000))]
                     ).fit(datos_ent[NUM + CAT], datos_ent.tardia)
 
