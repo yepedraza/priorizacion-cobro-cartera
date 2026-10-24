@@ -1,0 +1,12 @@
+# Lista de lo que SÍ entra al contexto de la imagen; todo lo demás (datos_crudos/, interno/,
+# entrega/, .venv/...) se excluye. src/cartera/ es solo código: la segmentación A lo necesita
+# para leer su paso de recorte.
+*
+!app/requirements.txt
+!app/servicio.py
+!app/demo.html
+!src/cartera/*.py
+!modelos/modelo_B.joblib
+!modelos/modelo_B.json
+!modelos/segmentacion_A.joblib
+!modelos/segmentacion_A.json

@@ -1,0 +1,56 @@
+{
+  "modelo": "A · K-means k = 2 sobre el perfil de pago del cliente (plazo_C.ipynb §0, R17)",
+  "variables": [
+    "atraso_mediano",
+    "atraso_iqr",
+    "pct_tardias",
+    "facturas_por_anio",
+    "log_monto_mediano",
+    "pct_varios_abonos",
+    "pct_cierre_nota"
+  ],
+  "ventana_del_perfil": "facturas emitidas de 2022-01 a 2025-06 con desenlace conocido al 1/07/2025",
+  "minimo_facturas_pagadas": 5,
+  "clientes": {
+    "entrenamiento": 158,
+    "prueba": 68,
+    "por_segmento": {
+      "paga a tiempo o casi": 171,
+      "paga tarde": 55
+    }
+  },
+  "cluster_a_segmento": {
+    "0": "paga a tiempo o casi",
+    "1": "paga tarde"
+  },
+  "politica_C": {
+    "paga a tiempo o casi": {
+      "accion": "Correo automático por factura, 5 días hábiles antes del vencimiento",
+      "dias_hasta_el_pago": {
+        "mediana": 28.0,
+        "percentil_75": 43.0
+      },
+      "pct_pagadas_dentro_del_plazo": 28.0
+    },
+    "paga tarde": {
+      "accion": "Contacto de la gestora apenas vence cada factura",
+      "dias_hasta_el_pago": {
+        "mediana": 72.5,
+        "percentil_75": 115.8
+      },
+      "pct_pagadas_dentro_del_plazo": 4.5
+    }
+  },
+  "aviso_C": "Propuesta para el piloto de C: su efecto no está demostrado. El piloto asigna clientes al azar dentro de cada segmento, mitad con esta gestión y mitad con la actual.",
+  "semilla": 2026,
+  "verificacion": "asigna a los 226 clientes el mismo segmento que plazo_C.ipynb §0",
+  "sha256": "60ff0fbeb029d93d4041f0c067d2d3197ef2eae2428951f7514f2ae3ada04ca0",
+  "contenido": [
+    "modelo.steps[0][1].steps[0][1].lim_inf_: float64 (7,)",
+    "modelo.steps[0][1].steps[0][1].lim_sup_: float64 (7,)",
+    "modelo.steps[0][1].steps[1][1].mean_: float64 (7,)",
+    "modelo.steps[0][1].steps[1][1].var_: float64 (7,)",
+    "modelo.steps[0][1].steps[1][1].scale_: float64 (7,)",
+    "modelo.steps[1][1].cluster_centers_: float64 (2, 7)"
+  ]
+}

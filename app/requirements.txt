@@ -1,0 +1,15 @@
+# Dependencias del servicio (imagen Docker). Python 3.14.5.
+# scikit-learn, pandas, numpy, scipy y joblib son las mismas versiones con que se ajustó y
+# verificó el modelo (requirements.txt del proyecto y modelos/modelo_B.json): un pickle de
+# scikit-learn solo es fiable con la versión que lo creó.
+scikit-learn==1.9.1
+pandas==3.0.6
+numpy==2.5.3
+scipy==1.18.1
+joblib==1.6.0
+threadpoolctl==3.7.0
+fastapi==0.162.0
+starlette==1.9.0
+pydantic==2.14.1
+pydantic_core==2.50.1
+uvicorn==0.54.0

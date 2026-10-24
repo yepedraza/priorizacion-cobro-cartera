@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Score de cartera</title>
+<style>
+  :root {
+    --fondo: #f6f7f9; --panel: #ffffff; --texto: #1c2430; --suave: #5b6675; --borde: #d9dee5;
+    --acento: #1f5fbf; --acento-suave: #e6eefb; --alto: #c2410c; --medio: #b7791f; --bajo: #2f7d4f;
+    --error: #b42318; --sombra: 0 1px 2px rgba(16, 24, 40, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fondo: #12161c; --panel: #1b2129; --texto: #e6eaf0; --suave: #9aa5b4; --borde: #2c3440;
+      --acento: #6ea2ff; --acento-suave: #1d2a40; --alto: #fb923c; --medio: #f6c453; --bajo: #5fcf8f;
+      --error: #f97066; --sombra: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--texto);
+         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 20px 16px 8px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--suave); }
+  main { max-width: 1100px; margin: 0 auto; padding: 8px 16px 40px; }
+  .panel { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px;
+           padding: 16px; box-shadow: var(--sombra); }
+  .acceso { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+  .acceso input { flex: 1 1 240px; }
+  .estado { font-size: 13px; color: var(--suave); }
+  .estado.ok { color: var(--bajo); } .estado.mal { color: var(--error); }
+  .pestanas { display: flex; gap: 4px; margin: 16px 0 0; border-bottom: 1px solid var(--borde); }
+  .pestanas button { background: none; border: 0; border-bottom: 3px solid transparent; color: var(--suave);
+                     padding: 10px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  .pestanas button[aria-selected="true"] { color: var(--acento); border-bottom-color: var(--acento); }
+  .vista { display: none; margin-top: 16px; }
+  .vista.activa { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 820px) { .vista.activa { grid-template-columns: 1fr; } }
+  fieldset { border: 0; margin: 0 0 12px; padding: 0; }
+  legend { font-weight: 700; margin-bottom: 8px; }
+  .campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+  @media (max-width: 520px) { .campos { grid-template-columns: 1fr; } }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--suave); }
+  label.ancho { grid-column: 1 / -1; }
+  label.fila { flex-direction: row; align-items: center; gap: 6px; }
+  input, select { font: inherit; color: var(--texto); background: var(--fondo); border: 1px solid var(--borde);
+                  border-radius: 6px; padding: 7px 9px; min-width: 0; }
+  input:focus, select:focus { outline: 2px solid var(--acento); outline-offset: 0; }
+  input:disabled { opacity: .5; }
+  .botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  button.principal, button.secundario { font: inherit; font-weight: 600; border-radius: 6px; padding: 9px 14px; cursor: pointer; }
+  button.principal { background: var(--acento); color: #fff; border: 1px solid var(--acento); }
+  button.secundario { background: none; color: var(--acento); border: 1px solid var(--borde); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .resultado h2 { font-size: 16px; margin: 0 0 12px; }
+  .cifra { font-size: 44px; font-weight: 750; line-height: 1; font-variant-numeric: tabular-nums; }
+  .barra { height: 12px; background: var(--acento-suave); border-radius: 6px; overflow: hidden; margin: 10px 0 6px; }
+  .barra > div { height: 100%; width: 0; background: var(--acento); transition: width .4s ease; }
+  .nota { font-size: 13px; color: var(--suave); }
+  .vacio { color: var(--suave); padding: 24px 0; text-align: center; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--borde); }
+  th { font-size: 12px; color: var(--suave); font-weight: 600; }
+  td.num, th.num { text-align: right; }
+  td { white-space: nowrap; } td.caso { white-space: normal; }
+  .mini { display: inline-block; width: 44px; height: 6px; background: var(--acento-suave); border-radius: 3px; vertical-align: middle; margin-right: 6px; }
+  .mini > span { display: block; height: 100%; background: var(--acento); border-radius: 3px; }
+  .segmento { font-size: 26px; font-weight: 750; margin: 4px 0 10px; }
+  .segmento.tarde { color: var(--alto); } .segmento.tiempo { color: var(--bajo); }
+  .accion { background: var(--acento-suave); border-radius: 8px; padding: 12px; margin: 10px 0; }
+  .accion strong { display: block; margin-bottom: 4px; }
+  .preparado { background: var(--acento-suave); border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+  .preparado label { color: var(--texto); font-weight: 600; }
+  .real { margin-top: 10px; padding: 8px 10px; border-left: 3px solid var(--medio); font-size: 14px; }
+  .error { color: var(--error); font-size: 14px; margin-top: 8px; white-space: pre-wrap; }
+  .separador { margin: 18px 0 10px; border-top: 1px solid var(--borde); }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 16px 30px; color: var(--suave); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Prioridad de cobro de cartera</h1>
+  <p>Modelo final del proyecto (regresión logística) y segmentación de clientes, servidos fuera del cuaderno.</p>
+</header>
+<main>
+  <div class="panel">
+    <div class="acceso">
+      <input id="token" type="password" placeholder="Token de acceso" autocomplete="off" aria-label="Token de acceso">
+      <button class="principal" id="conectar">Conectar</button>
+      <span class="estado" id="estado">Sin conectar</span>
+    </div>
+    <div class="nota" id="ficha">El token solo se guarda en la memoria de esta pestaña.</div>
+  </div>
+
+  <div class="pestanas" role="tablist">
+    <button role="tab" aria-selected="true" data-vista="vista-b">Factura · riesgo de pago tardío</button>
+    <button role="tab" aria-selected="false" data-vista="vista-a">Cliente · segmento y gestión</button>
+  </div>
+
+  <!-- B: score de pago tardío -->
+  <section class="vista activa" id="vista-b">
+    <form class="panel" id="form-b" novalidate>
+      <div class="preparado" id="prep-b" hidden>
+        <label>Caso preparado (llena el formulario)
+          <select id="caso-b"></select></label>
+      </div>
+      <fieldset>
+        <legend>La factura</legend>
+        <div class="campos">
+          <label class="ancho">Nombre del caso (opcional, nunca un NIT)
+            <input name="referencia" maxlength="40" placeholder="p. ej., caso 1"></label>
+          <label>Valor de la factura ($)
+            <input name="valor" type="number" min="0" step="any" required></label>
+          <label>Plazo pactado (días)
+            <input name="plazo_dias_observado" type="number" min="0" max="3650" step="1" required></label>
+          <label>Mes de emisión
+            <select name="fecha_mes" required></select></label>
+          <label>Unidad de negocio
+            <select name="unidad_negocio" required></select></label>
+          <label class="ancho">Tipo de cliente
+            <select name="tipo_cliente" required></select></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>El cliente el día en que se emite</legend>
+        <div class="campos">
+          <label>Facturas pagadas antes
+            <input name="n_pagadas_hist" type="number" min="0" step="1" required></label>
+          <label>Atraso promedio de esas facturas (días)
+            <input name="atraso_prom_hist" type="number" step="any"></label>
+          <label>Saldo abierto del cliente ($)
+            <input name="saldo_abierto_t" type="number" step="any" required></label>
+          <label>Facturas abiertas
+            <input name="n_abiertas_t" type="number" min="0" step="1" required></label>
+          <label>De ellas, ya vencidas
+            <input name="n_vencidas_t" type="number" min="0" step="1" required></label>
+          <label>Antigüedad del cliente (días)
+            <input name="antiguedad_dias" type="number" min="0" step="any" required></label>
+        </div>
+      </fieldset>
+      <div class="botones">
+        <button class="principal" type="submit" id="calcular-b" disabled>Calcular riesgo</button>
+        <button class="secundario" type="reset" onclick="activoB = null">Limpiar formulario</button>
+      </div>
+      <div class="error" id="error-b"></div>
+    </form>
+
+    <div class="panel resultado">
+      <h2>Probabilidad de pago tardío (más de 30 días de atraso)</h2>
+      <div id="res-b" class="vacio">Llene la factura y calcule.</div>
+      <div class="separador"></div>
+      <h2>Lista de esta sesión, ordenada por probabilidad × valor</h2>
+      <div id="lista" class="vacio">Cada factura calculada se agrega aquí, como en la lista diaria.</div>
+      <div class="botones"><button class="secundario" id="vaciar" hidden>Vaciar la lista</button></div>
+    </div>
+  </section>
+
+  <!-- A + C: segmento y gestión -->
+  <section class="vista" id="vista-a">
+    <form class="panel" id="form-a" novalidate>
+      <div class="preparado" id="prep-a" hidden>
+        <label>Caso preparado (llena el formulario)
+          <select id="caso-a"></select></label>
+      </div>
+      <fieldset>
+        <legend>Cómo ha pagado el cliente (facturas de 2022-01 a 2025-06)</legend>
+        <div class="campos">
+          <label class="ancho">Nombre del caso (opcional, nunca un NIT)
+            <input name="referencia" maxlength="40" placeholder="p. ej., cliente 1"></label>
+          <label>Atraso mediano (días)
+            <input name="atraso_mediano" type="number" step="any" required></label>
+          <label>Rango intercuartílico del atraso (días)
+            <input name="atraso_iqr" type="number" min="0" step="any" required></label>
+          <label>% de facturas con más de 30 días
+            <input name="pct_tardias" type="number" min="0" max="100" step="any" required></label>
+          <label>Facturas por año
+            <input name="facturas_por_anio" type="number" min="0" step="any" required></label>
+          <label>Monto mediano de sus facturas ($)
+            <input name="monto_mediano" type="number" min="0" step="any" required></label>
+          <label>% pagadas con varios abonos
+            <input name="pct_varios_abonos" type="number" min="0" max="100" step="any" required></label>
+          <label class="ancho">% cerradas con notas o ajustes
+            <input name="pct_cierre_nota" type="number" min="0" max="100" step="any" required></label>
+        </div>
+      </fieldset>
+      <p class="nota">Válido para clientes con al menos 5 facturas pagadas en ese periodo.</p>
+      <div class="botones">
+        <button class="principal" type="submit" id="calcular-a" disabled>Ver segmento</button>
+        <button class="secundario" type="reset" onclick="activoA = null">Limpiar formulario</button>
+      </div>
+      <div class="error" id="error-a"></div>
+    </form>
+
+    <div class="panel resultado">
+      <h2>Segmento del cliente y gestión que propone el piloto</h2>
+      <div id="res-a" class="vacio">Llene el perfil de pago y consulte.</div>
+    </div>
+  </section>
+</main>
+<footer>
+  La probabilidad ordena bien (AUC-PR 0,744 en la prueba, frente a 0,386 de la línea base), pero en
+  la prueba quedó corta: sirve para priorizar, no para leerla al pie de la letra. Esta página no
+  contiene datos de la compañía: los casos preparados solo los entrega el servicio con el token.
+</footer>
+
+<script>
+const CATEGORIAS = __CATEGORIAS__;
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+               "septiembre", "octubre", "noviembre", "diciembre"];
+let token = "";
+let lista = [];
+let casos = null, activoB = null, activoA = null;
+
+const $ = (s) => document.querySelector(s);
+const pct = (p) => (p * 100).toLocaleString("es-CO", { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + " %";
+const pesos = (v) => "$" + Math.round(v).toLocaleString("es-CO");
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function opciones(select, valores, etiquetas) {
+  select.innerHTML = '<option value="" disabled selected>Elegir…</option>' +
+    valores.map((v, i) => `<option value="${esc(v)}">${esc(etiquetas ? etiquetas[i] : v)}</option>`).join("");
+}
+opciones($('#form-b [name="fecha_mes"]'), MESES.map((_, i) => i + 1), MESES);
+opciones($('#form-b [name="unidad_negocio"]'), CATEGORIAS.unidad_negocio);
+opciones($('#form-b [name="tipo_cliente"]'), CATEGORIAS.tipo_cliente);
+
+document.querySelectorAll(".pestanas button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".pestanas button").forEach((x) => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll(".vista").forEach((v) => v.classList.toggle("activa", v.id === b.dataset.vista));
+}));
+
+// El atraso promedio solo existe si el cliente ya pagó alguna factura
+const pagadas = $('#form-b [name="n_pagadas_hist"]'), atraso = $('#form-b [name="atraso_prom_hist"]');
+function revisarAtraso() {
+  const sin = pagadas.value !== "" && Number(pagadas.value) === 0;
+  atraso.disabled = sin;
+  atraso.placeholder = sin ? "sin facturas pagadas" : "";
+  if (sin) atraso.value = "";
+}
+pagadas.addEventListener("input", revisarAtraso);
+
+async function llamar(ruta, cuerpo) {
+  const r = await fetch(ruta, {
+    method: cuerpo ? "POST" : "GET",
+    headers: { "Authorization": "Bearer " + token, ...(cuerpo ? { "Content-Type": "application/json" } : {}) },
+    body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+  });
+  const datos = await r.json().catch(() => ({}));
+  if (r.status === 401) throw new Error("Token ausente o incorrecto: el servicio respondió 401.");
+  if (r.status === 422) throw new Error("El servicio rechazó los datos:\n" +
+    (datos.detail || []).map((d) => `· ${d.loc.slice(-1)[0]}: ${d.msg}`).join("\n"));
+  if (!r.ok) throw new Error(`El servicio respondió ${r.status}.`);
+  return datos;
+}
+
+$("#conectar").addEventListener("click", async () => {
+  token = $("#token").value.trim();
+  const estado = $("#estado");
+  try {
+    const f = await llamar("/modelo");
+    estado.textContent = "Conectado"; estado.className = "estado ok";
+    $("#ficha").textContent = `${f.modelo} · entrenado con ${f.entrenamiento.facturas.toLocaleString("es-CO")} facturas · `
+      + `prueba: AUC-PR ${f.verificacion_prueba.obtenidas["AUC-PR"]} (igual a la publicada en el cuaderno)`;
+    $("#calcular-b").disabled = false; $("#calcular-a").disabled = false;
+    await cargarCasos();
+  } catch (e) {
+    estado.textContent = e.message; estado.className = "estado mal";
+    $("#calcular-b").disabled = true; $("#calcular-a").disabled = true;
+  }
+});
+$("#token").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#conectar").click(); });
+
+function numero(form, nombre) {
+  const v = form.elements[nombre].value;
+  return v === "" ? null : Number(v);
+}
+
+// Casos preparados: los entrega el servicio solo con el token (ruta /casos)
+async function cargarCasos() {
+  try { casos = await llamar("/casos"); } catch { casos = null; }
+  for (const [tipo, lista_] of [["b", casos?.B], ["a", casos?.A]]) {
+    const sel = $("#caso-" + tipo);
+    $("#prep-" + tipo).hidden = !lista_?.length;
+    if (lista_?.length) opciones(sel, lista_.map((_, i) => i), lista_.map((c) => c.caso));
+  }
+}
+function poner(form, campos) {
+  for (const [k, v] of Object.entries(campos)) if (form.elements[k]) form.elements[k].value = v ?? "";
+}
+$("#caso-b").addEventListener("change", (e) => {
+  const c = casos.B[e.target.value], f = c.factura;
+  poner($("#form-b"), {
+    referencia: f.referencia, valor: f.saldo, plazo_dias_observado: f.plazo_dias_observado,
+    fecha_mes: f.fecha_mes, unidad_negocio: f.unidad_negocio, tipo_cliente: f.tipo_cliente,
+    n_pagadas_hist: f.n_pagadas_hist, atraso_prom_hist: f.atraso_prom_hist,
+    saldo_abierto_t: f.saldo_abierto_t, n_abiertas_t: f.n_abiertas_t,
+    n_vencidas_t: f.n_vencidas_t, antiguedad_dias: f.antiguedad_dias,
+  });
+  revisarAtraso();
+  activoB = c;
+});
+$("#caso-a").addEventListener("change", (e) => {
+  const c = casos.A[e.target.value], k = c.cliente;
+  poner($("#form-a"), { ...k, monto_mediano: Math.expm1(k.log_monto_mediano).toFixed(2) });
+  activoA = c;
+});
+// Si alguien cambia un campo a mano, ya no es el caso preparado: no se muestra su desenlace
+$("#form-b").addEventListener("input", (e) => { if (e.target.id !== "caso-b") { activoB = null; $("#caso-b").selectedIndex = 0; } });
+$("#form-a").addEventListener("input", (e) => { if (e.target.id !== "caso-a") { activoA = null; $("#caso-a").selectedIndex = 0; } });
+
+$("#form-b").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target, error = $("#error-b");
+  error.textContent = "";
+  if (!f.checkValidity()) { error.textContent = "Faltan campos o hay valores fuera de rango."; f.reportValidity(); return; }
+  const valor = numero(f, "valor");
+  const factura = {
+    referencia: f.elements.referencia.value.trim() || `caso ${lista.length + 1}`,
+    plazo_dias_observado: numero(f, "plazo_dias_observado"),
+    log_monto_inicial: Math.log1p(valor),
+    fecha_mes: numero(f, "fecha_mes"),
+    atraso_prom_hist: Number(f.elements.n_pagadas_hist.value) === 0 ? null : numero(f, "atraso_prom_hist"),
+    n_pagadas_hist: numero(f, "n_pagadas_hist"),
+    saldo_abierto_t: numero(f, "saldo_abierto_t"),
+    n_abiertas_t: numero(f, "n_abiertas_t"),
+    n_vencidas_t: numero(f, "n_vencidas_t"),
+    antiguedad_dias: numero(f, "antiguedad_dias"),
+    unidad_negocio: f.elements.unidad_negocio.value,
+    tipo_cliente: f.elements.tipo_cliente.value,
+    saldo: valor,
+  };
+  if (factura.n_pagadas_hist > 0 && factura.atraso_prom_hist === null) {
+    error.textContent = "Si el cliente ya pagó facturas, falta su atraso promedio."; return;
+  }
+  try {
+    const [r] = await llamar("/predecir", { facturas: [factura] });
+    mostrarProbabilidad(r, activoB);
+    lista = lista.filter((x) => x.referencia !== factura.referencia).concat(factura);
+    await mostrarLista();
+  } catch (err) { error.textContent = err.message; }
+});
+
+function mostrarProbabilidad(r, caso) {
+  const p = r.probabilidad_pago_tardio;
+  $("#res-b").className = "";
+  $("#res-b").innerHTML = `
+    <div class="nota">${esc(r.referencia)}</div>
+    <div class="cifra">${pct(p)}</div>
+    <div class="barra"><div style="width:0"></div></div>
+    <div class="nota">Probabilidad × valor: <strong>${pesos(r.monto_en_riesgo)}</strong> de dinero en riesgo.
+      En la prueba, 38,6 % de las facturas terminaron tardías.</div>` +
+    (caso ? `<div class="real">Desenlace real: <strong>${esc(caso.desenlace_real)}</strong></div>` : "");
+  requestAnimationFrame(() => { $("#res-b .barra > div").style.width = (p * 100) + "%"; });
+}
+
+async function mostrarLista() {
+  if (!lista.length) {
+    $("#lista").className = "vacio"; $("#lista").textContent = "Cada factura calculada se agrega aquí, como en la lista diaria.";
+    $("#vaciar").hidden = true; return;
+  }
+  const ordenada = await llamar("/predecir", { facturas: lista });
+  $("#lista").className = "";
+  $("#lista").innerHTML = `<table><thead><tr><th>#</th><th>Caso</th><th>Probabilidad</th>
+      <th class="num">Valor</th><th class="num">Prob. × valor</th></tr></thead><tbody>` +
+    ordenada.map((r, i) => {
+      const valor = lista.find((x) => x.referencia === r.referencia).saldo;
+      return `<tr><td>${i + 1}</td><td class="caso">${esc(r.referencia)}</td>
+        <td><span class="mini"><span style="width:${r.probabilidad_pago_tardio * 100}%"></span></span>${pct(r.probabilidad_pago_tardio)}</td>
+        <td class="num">${pesos(valor)}</td><td class="num"><strong>${pesos(r.monto_en_riesgo)}</strong></td></tr>`;
+    }).join("") + "</tbody></table>";
+  $("#vaciar").hidden = false;
+}
+$("#vaciar").addEventListener("click", () => { lista = []; mostrarLista(); });
+
+$("#form-a").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target, error = $("#error-a");
+  error.textContent = "";
+  if (!f.checkValidity()) { error.textContent = "Faltan campos o hay valores fuera de rango."; f.reportValidity(); return; }
+  const cliente = {
+    referencia: f.elements.referencia.value.trim() || "cliente",
+    atraso_mediano: numero(f, "atraso_mediano"),
+    atraso_iqr: numero(f, "atraso_iqr"),
+    pct_tardias: numero(f, "pct_tardias"),
+    facturas_por_anio: numero(f, "facturas_por_anio"),
+    log_monto_mediano: Math.log1p(numero(f, "monto_mediano")),
+    pct_varios_abonos: numero(f, "pct_varios_abonos"),
+    pct_cierre_nota: numero(f, "pct_cierre_nota"),
+  };
+  try {
+    const [r] = await llamar("/segmentar", { clientes: [cliente] });
+    const tarde = r.segmento === "paga tarde";
+    $("#res-a").className = "";
+    $("#res-a").innerHTML = `
+      <div class="nota">${esc(r.referencia)}</div>
+      <div class="segmento ${tarde ? "tarde" : "tiempo"}">«${esc(r.segmento)}»</div>
+      <div class="nota">Su segmento tarda una mediana de <strong>${r.dias_hasta_el_pago_del_segmento.mediana.toLocaleString("es-CO")} días</strong>
+        desde la emisión hasta el pago (percentil 75: ${r.dias_hasta_el_pago_del_segmento.percentil_75.toLocaleString("es-CO")} días).</div>
+      <div class="accion"><strong>Gestión que propone el piloto</strong>${esc(r.accion_C)}</div>
+      <div class="nota">${esc(r.aviso_C)}</div>` +
+      (activoA?.despues_de_2025_06 ? `<div class="real">Después de 2025-06, este cliente: <strong>${activoA.despues_de_2025_06.pct_tardias.toLocaleString("es-CO")} % de facturas tardías</strong>
+        en ${activoA.despues_de_2025_06.facturas_con_desenlace} facturas. El segmento se formó con su comportamiento hasta junio de 2025.</div>` : "");
+  } catch (err) { error.textContent = err.message; }
+});
+</script>
+</body>
+</html>

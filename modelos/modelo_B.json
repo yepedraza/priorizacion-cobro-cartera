@@ -1,0 +1,85 @@
+{
+  "modelo": "B · regresión logística sin class_weight (evaluacion_B.ipynb §3)",
+  "fecha_ajuste": "2026-10-23",
+  "entrenamiento": {
+    "desde": "2022-01-01",
+    "hasta": "2025-06-30",
+    "facturas": 8930,
+    "tardias_pct": 30.2
+  },
+  "predictoras_numericas": [
+    "plazo_dias_observado",
+    "log_monto_inicial",
+    "fecha_mes",
+    "atraso_prom_hist",
+    "n_pagadas_hist",
+    "saldo_abierto_t",
+    "n_abiertas_t",
+    "n_vencidas_t",
+    "antiguedad_dias"
+  ],
+  "predictoras_categoricas": [
+    "unidad_negocio",
+    "tipo_cliente"
+  ],
+  "categorias": {
+    "unidad_negocio": [
+      "Unidad 01",
+      "Unidad 02",
+      "Unidad 03",
+      "Unidad 04",
+      "Unidad 05",
+      "Unidad 06",
+      "Unidad 07",
+      "Unidad 08",
+      "Unidad 09",
+      "Unidad 11"
+    ],
+    "tipo_cliente": [
+      "EXTERIOR",
+      "JURIDICA_NACIONAL",
+      "NATURAL"
+    ]
+  },
+  "semilla": 2026,
+  "versiones": {
+    "python": "3.14.5",
+    "scikit-learn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0"
+  },
+  "verificacion_prueba": {
+    "publicadas": {
+      "facturas": 3970,
+      "AUC-PR": 0.744,
+      "AUC-ROC": 0.829,
+      "Brier": 0.177
+    },
+    "obtenidas": {
+      "facturas": 3970,
+      "AUC-PR": 0.744,
+      "AUC-ROC": 0.829,
+      "Brier": 0.177
+    },
+    "coinciden": true
+  },
+  "sha256": "a7f31faae941480e759caa28066cf4f5d22349a31749155ef0e5a48175c14908",
+  "contenido": [
+    "modelo.steps[0][1].feature_names_in_: object (11,)",
+    "modelo.steps[0][1].transformers_[0][1].steps[0][1].feature_names_in_: object (9,)",
+    "modelo.steps[0][1].transformers_[0][1].steps[0][1].indicator_.features_: int64 (1,)",
+    "modelo.steps[0][1].transformers_[0][1].steps[0][1].statistics_: float64 (9,)",
+    "modelo.steps[0][1].transformers_[0][1].steps[1][1].mean_: float64 (10,)",
+    "modelo.steps[0][1].transformers_[0][1].steps[1][1].var_: float64 (10,)",
+    "modelo.steps[0][1].transformers_[0][1].steps[1][1].scale_: float64 (10,)",
+    "modelo.steps[0][1].transformers_[1][1].feature_names_in_: object (2,)",
+    "modelo.steps[0][1].transformers_[1][1].categories_[0]: object (10,)",
+    "modelo.steps[0][1].transformers_[1][1].categories_[1]: object (3,)",
+    "modelo.steps[1][1].classes_: int64 (2,)",
+    "modelo.steps[1][1].n_iter_: int32 (1,)",
+    "modelo.steps[1][1].coef_: float64 (1, 23)",
+    "modelo.steps[1][1].intercept_: float64 (1,)"
+  ]
+}
