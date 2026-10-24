@@ -6,8 +6,9 @@ de la compañía) y devuelve la probabilidad de que se pague con más de 30 día
 `/segmentar` agrega la segmentación A: recibe el perfil de pago de un cliente y devuelve su
 segmento y lo que C propone para él (acción del piloto y plazo real del segmento).
 
-Acceso: todas las rutas salvo `/salud` exigen el token de la variable de entorno `TOKEN_API`, como
-cabecera `Authorization: Bearer <token>` (en `/docs`, botón «Authorize»).
+Acceso: las rutas que devuelven datos exigen un token como cabecera `Authorization: Bearer <token>`
+(en `/docs`, botón «Authorize»). Vale el del equipo (`TOKEN_API`) y, si se configura, el del QR
+(`TOKEN_QR`), que se revoca por separado borrando esa variable.
 """
 
 import hashlib
@@ -50,6 +51,7 @@ VARIABLES_A = FICHA_A["variables"]
 TOKEN = os.environ.get("TOKEN_API")
 if not TOKEN:
     raise RuntimeError("Falta la variable de entorno TOKEN_API")
+TOKENS = [t.encode() for t in (TOKEN, os.environ.get("TOKEN_QR")) if t]
 
 app = FastAPI(
     title="Score de pago tardío (componente B)",
@@ -66,7 +68,9 @@ _bearer = HTTPBearer(auto_error=False)
 
 
 def exigir_token(cred: HTTPAuthorizationCredentials | None = Depends(_bearer)):
-    if cred is None or not secrets.compare_digest(cred.credentials.encode(), TOKEN.encode()):
+    # Se comparan todos los tokens, sin cortar en el primero, para no revelar cuál coincidió
+    valido = cred is not None and sum(secrets.compare_digest(cred.credentials.encode(), t) for t in TOKENS) > 0
+    if not valido:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Token ausente o incorrecto",
                             headers={"WWW-Authenticate": "Bearer"})
 

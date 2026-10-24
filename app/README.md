@@ -25,7 +25,7 @@ Docker no recibe.
 ## Rutas del servicio
 
 Todas, salvo `/salud`, `/demo` y `/docs` (que solo muestran páginas), exigen el token de la variable de entorno `TOKEN_API` como cabecera
-`Authorization: Bearer <token>`. En `/demo` se escribe en «Token de acceso»; en `/docs`, con el botón **Authorize**.
+`Authorization: Bearer <token>`. Si se define `TOKEN_QR`, ese segundo token también vale y se revoca por separado borrando la variable; `/demo#t=<token>` abre la página ya conectada (lo que va después de `#` no llega al servidor). En `/demo` se escribe en «Token de acceso»; en `/docs`, con el botón **Authorize**.
 
 | Ruta | Qué devuelve |
 |---|---|
@@ -76,11 +76,11 @@ registro debe ser único en Azure. La región tiene que ser una de las que permi
 az group create -n rg-pfi-score-b -l brazilsouth
 az acr create -g rg-pfi-score-b -n <registro> --sku Basic --admin-enabled true
 az acr login -n <registro>
-docker tag score-b <registro>.azurecr.io/score-b:1.3
-docker push <registro>.azurecr.io/score-b:1.3
+docker tag score-b <registro>.azurecr.io/score-b:1.5
+docker push <registro>.azurecr.io/score-b:1.5
 az containerapp env create -g rg-pfi-score-b -n env-pfi-score-b -l brazilsouth --logs-destination none
 az containerapp create -g rg-pfi-score-b -n score-b --environment env-pfi-score-b \
-  --image <registro>.azurecr.io/score-b:1.3 --registry-server <registro>.azurecr.io \
+  --image <registro>.azurecr.io/score-b:1.5 --registry-server <registro>.azurecr.io \
   --registry-username <registro> --registry-password <contraseña del registro> \
   --secrets token-api=<token> --env-vars TOKEN_API=secretref:token-api \
   --ingress external --target-port 8000 --cpu 0.5 --memory 1.0Gi --min-replicas 1 --max-replicas 1

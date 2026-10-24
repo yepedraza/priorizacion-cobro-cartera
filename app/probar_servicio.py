@@ -13,7 +13,8 @@ Comprueba:
    del Pipeline ajustado en el cuaderno, que aquí se vuelve a ajustar con el mismo código;
 3. una categoría desconocida se rechaza con 422;
 4. para los 68 clientes de prueba de la segmentación, `/segmentar` da el mismo segmento que
-   `plazo_C.ipynb`.
+   `plazo_C.ipynb`;
+5. si se pasa `TOKEN_QR`, el token del QR también da acceso.
 
 Las facturas viajan sin `id_saldo` ni NIT: solo sus 11 predictoras.
 """
@@ -97,11 +98,17 @@ def main():
     obtenidos = [x["segmento"] for x in r.json()]
     assert obtenidos == list(segmento.loc[clientes_prueba.index]), "segmentos distintos al cuaderno"
 
+    token_qr = os.environ.get("TOKEN_QR")
+    if token_qr:
+        assert c.get("/modelo", headers={"Authorization": f"Bearer {token_qr}"}).status_code == 200
+
     print(f"Servicio: {args.url or 'en el mismo proceso'}")
     print("401 sin token y con token incorrecto: sí")
     print(f"200 facturas de la prueba: probabilidad idéntica a la del cuaderno (diferencia máxima {dif})")
     print("Categoría desconocida rechazada con 422: sí")
     print(f"{len(obtenidos)} clientes de prueba de A: mismo segmento que plazo_C.ipynb")
+    if token_qr:
+        print("Token del QR: da acceso")
 
 
 if __name__ == "__main__":
